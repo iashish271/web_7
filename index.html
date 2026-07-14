@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Train to Talat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-train">
+            <div class="train-steam"></div>
+            <div class="train-steam"></div>
+            <div class="train-steam"></div>
+        </div>
+        <div class="loading-text">The Train to <span>Talat</span> is preparing for departure...</div>
+        <div class="loading-track">
+            <div class="loading-progress"></div>
+        </div>
+    </div>
+
+    <!-- Music Control -->
+    <div id="music-control" class="hidden">
+        <button id="music-btn" aria-label="Toggle Music">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18V5l12-2v13"/>
+                <circle cx="6" cy="18" r="3"/>
+                <circle cx="18" cy="16" r="3"/>
+            </svg>
+            <span class="music-note">♪</span>
+        </button>
+    </div>
+
+    <!-- Transition Overlay -->
+    <div id="transition-overlay"></div>
+
+    <!-- Particle Canvases -->
+    <canvas id="particle-canvas"></canvas>
+    <canvas id="fireworks-canvas"></canvas>
+
+    <!-- ==================== STATION 1: THE DEPARTURE ==================== -->
+    <section id="station1" class="station active">
+        <div class="bg-image" style="background-image: url('images/station1_departure.jpg')"></div>
+        <div class="bg-overlay"></div>
+        <div class="rain-container"></div>
+        <div class="fog-layer"></div>
+        <div class="lamp-glow"></div>
+        
+        <div class="station-content">
+            <div class="typewriter-text" id="s1-text1">One ticket.</div>
+            <div class="typewriter-text" id="s1-text2">One journey.</div>
+            <div class="typewriter-text" id="s1-text3">One very special destination.</div>
+            
+            <div class="train-whistle" id="whistle-container">
+                <div class="whistle-lines"></div>
+                <div class="whistle-lines"></div>
+                <div class="whistle-lines"></div>
+            </div>
+            
+            <button class="board-btn" id="board-btn">
+                <span>Board The Train</span>
+                <span class="heart-icon">❤</span>
+            </button>
+        </div>
+        
+        <div class="scroll-indicator">
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- ==================== STATION 2: THE BLOSSOM VALLEY ==================== -->
+    <section id="station2" class="station">
+        <div class="bg-image" style="background-image: url('images/station2_blossom.jpg')"></div>
+        <div class="bg-overlay light"></div>
+        <div class="petal-container"></div>
+        <div class="window-frame"></div>
+        
+        <div class="station-content">
+            <div class="typewriter-text" id="s2-text1">Some people make ordinary days</div>
+            <div class="typewriter-text" id="s2-text2">feel beautiful.</div>
+            <div class="quote-author">— For Talat</div>
+        </div>
+        
+        <div class="parallax-train" id="parallax-train">
+            <div class="train-window-glow"></div>
+        </div>
+        
+        <button class="next-station-btn" data-next="3">
+            <span>Continue Journey</span>
+            <div class="btn-arrow">→</div>
+        </button>
+    </section>
+
+    <!-- ==================== STATION 3: THE MEMORY COACH ==================== -->
+    <section id="station3" class="station">
+        <div class="bg-image" style="background-image: url('images/station3_memory.jpg')"></div>
+        <div class="bg-overlay"></div>
+        <div class="dust-particles"></div>
+        
+        <div class="station-content center">
+            <h2 class="station-title">The Memory Coach</h2>
+            <p class="station-subtitle">Every moment with you is a treasure</p>
+            
+            <div class="photo-gallery">
+                <div class="polaroid" data-caption="Our First Sunset" style="--delay: 0s; --rotate: -5deg;">
+                    <img src="images/memory1.jpg" alt="Memory 1">
+                    <div class="polaroid-caption">Our First Sunset</div>
+                </div>
+                <div class="polaroid" data-caption="Under the Stars" style="--delay: 0.3s; --rotate: 3deg;">
+                    <img src="images/memory2.jpg" alt="Memory 2">
+                    <div class="polaroid-caption">Under the Stars</div>
+                </div>
+                <div class="polaroid" data-caption="Coffee & Laughter" style="--delay: 0.6s; --rotate: -2deg;">
+                    <img src="images/memory3.jpg" alt="Memory 3">
+                    <div class="polaroid-caption">Coffee & Laughter</div>
+                </div>
+                <div class="polaroid" data-caption="Dancing Together" style="--delay: 0.9s; --rotate: 4deg;">
+                    <img src="images/memory4.jpg" alt="Memory 4">
+                    <div class="polaroid-caption">Dancing Together</div>
+                </div>
+                <div class="polaroid" data-caption="Fireworks Night" style="--delay: 1.2s; --rotate: -3deg;">
+                    <img src="images/memory5.jpg" alt="Memory 5">
+                    <div class="polaroid-caption">Fireworks Night</div>
+                </div>
+                <div class="polaroid" data-caption="Sunrise Promise" style="--delay: 1.5s; --rotate: 2deg;">
+                    <img src="images/memory6.jpg" alt="Memory 6">
+                    <div class="polaroid-caption">Sunrise Promise</div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="next-station-btn" data-next="4">
+            <span>Continue Journey</span>
+            <div class="btn-arrow">→</div>
+        </button>
+    </section>
+
+    <!-- Photo Modal -->
+    <div id="photo-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <img id="modal-img" src="" alt="Memory">
+            <div class="modal-caption"></div>
+        </div>
+    </div>
+
+    <!-- ==================== STATION 4: BIRTHDAY TOWN ==================== -->
+    <section id="station4" class="station">
+        <div class="bg-image" style="background-image: url('images/station4_birthday.jpg')"></div>
+        <div class="bg-overlay light"></div>
+        <div class="confetti-container"></div>
+        <div class="sparkle-container"></div>
+        
+        <div class="station-content center">
+            <div class="birthday-number" id="birthday-number">
+                <span class="num-glow">1</span>
+                <span class="num-glow">9</span>
+            </div>
+            
+            <div class="birthday-text" id="birthday-text">
+                <div class="bday-line">Happy Birthday</div>
+                <div class="bday-name">Talat <span class="heart-pulse">❤</span></div>
+            </div>
+            
+            <div class="balloons-container">
+                <div class="balloon"></div>
+                <div class="balloon"></div>
+                <div class="balloon"></div>
+                <div class="balloon"></div>
+                <div class="balloon"></div>
+            </div>
+        </div>
+        
+        <button class="next-station-btn" data-next="5">
+            <span>Continue Journey</span>
+            <div class="btn-arrow">→</div>
+        </button>
+    </section>
+
+    <!-- ==================== STATION 5: THE WISHES PLATFORM ==================== -->
+    <section id="station5" class="station">
+        <div class="bg-image" style="background-image: url('images/station5_wishes.jpg')"></div>
+        <div class="bg-overlay light"></div>
+        <div class="floating-lanterns"></div>
+        <div class="petal-container pink"></div>
+        
+        <div class="station-content">
+            <h2 class="station-title wishes-title">Wishes for You</h2>
+            
+            <div class="wishes-container">
+                <div class="wish-card" style="--delay: 0s;">
+                    <div class="wish-paper">
+                        <p class="handwriting-text">May every sunrise bring you new reasons to smile...</p>
+                    </div>
+                </div>
+                <div class="wish-card" style="--delay: 1.5s;">
+                    <div class="wish-paper">
+                        <p class="handwriting-text">May your dreams be bigger than the sky above...</p>
+                    </div>
+                </div>
+                <div class="wish-card" style="--delay: 3s;">
+                    <div class="wish-paper">
+                        <p class="handwriting-text">May love surround you like these stars in the night...</p>
+                    </div>
+                </div>
+                <div class="wish-card" style="--delay: 4.5s;">
+                    <div class="wish-paper">
+                        <p class="handwriting-text">May this year be the most magical chapter of your life...</p>
+                    </div>
+                </div>
+                <div class="wish-card" style="--delay: 6s;">
+                    <div class="wish-paper">
+                        <p class="handwriting-text">May you always know how deeply you are loved...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="next-station-btn" data-next="6">
+            <span>Continue Journey</span>
+            <div class="btn-arrow">→</div>
+        </button>
+    </section>
+
+    <!-- ==================== STATION 6: THE SECRET PACKAGE ==================== -->
+    <section id="station6" class="station">
+        <div class="bg-image" style="background-image: url('images/station6_package.jpg')"></div>
+        <div class="bg-overlay"></div>
+        <div class="dust-particles"></div>
+        
+        <div class="station-content center">
+            <div class="package-scene">
+                <div class="old-package" id="secret-package">
+                    <div class="package-box">
+                        <div class="package-ribbon"></div>
+                        <div class="package-tag">For Talat <span>❤</span></div>
+                    </div>
+                    <div class="tap-hint">Tap to Open</div>
+                </div>
+                
+                <div class="envelope-reveal" id="envelope-reveal">
+                    <img src="images/envelope.png" alt="Letter" class="envelope-img">
+                    <div class="envelope-glow"></div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="next-station-btn hidden" id="s6-next" data-next="7">
+            <span>Open the Letter</span>
+            <div class="btn-arrow">→</div>
+        </button>
+    </section>
+
+    <!-- ==================== STATION 7: THE LETTER STATION ==================== -->
+    <section id="station7" class="station">
+        <div class="bg-image" style="background-image: url('images/station7_letter.jpg')"></div>
+        <div class="bg-overlay"></div>
+        <div class="candle-glow"></div>
+        <div class="dust-particles golden"></div>
+        
+        <div class="station-content center">
+            <div class="letter-scene">
+                <div class="envelope-closed" id="letter-envelope">
+                    <img src="images/envelope.png" alt="Envelope" class="letter-envelope-img">
+                    <div class="wax-seal" id="wax-seal">
+                        <img src="images/waxseal.png" alt="Wax Seal">
+                    </div>
+                    <div class="tap-hint">Tap to Open</div>
+                </div>
+                
+                <div class="letter-opened" id="letter-opened">
+                    <div class="letter-paper">
+                        <div class="letter-content">
+                            <p class="letter-line">My Dearest Talat,</p>
+                            <p class="letter-line">As I write these words, I am reminded of how incredibly lucky I am to have you in my life. You are the most beautiful person I have ever known, inside and out.</p>
+                            <p class="letter-line">Every moment spent with you feels like a dream I never want to wake up from. Your smile lights up my world in ways I never thought possible.</p>
+                            <p class="letter-line">On this special day, I want you to know that you are loved beyond measure. You deserve all the happiness this universe has to offer.</p>
+                            <p class="letter-line">Thank you for being you. Thank you for existing. Thank you for making my life complete.</p>
+                            <p class="letter-line">Happy Birthday, my love. May this year bring you endless joy and countless reasons to smile.</p>
+                            <p class="letter-line signature">Forever Yours,</p>
+                            <p class="letter-line signature-name">Ashish <span>❤</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="next-station-btn hidden" id="s7-next" data-next="8">
+            <span>Continue Journey</span>
+            <div class="btn-arrow">→</div>
+        </button>
+    </section>
+
+    <!-- ==================== STATION 8: THE STARLIGHT BRIDGE ==================== -->
+    <section id="station8" class="station">
+        <div class="bg-image" style="background-image: url('images/station8_starlight.jpg')"></div>
+        <div class="bg-overlay dark"></div>
+        <canvas id="constellation-canvas"></canvas>
+        <div class="firefly-container"></div>
+        
+        <div class="station-content center">
+            <div class="constellation-text" id="constellation-text">
+                <p>Look up...</p>
+                <p>The stars have a message for you.</p>
+            </div>
+            
+            <div class="star-name" id="star-name">
+                <span>T</span><span>A</span><span>L</span><span>A</span><span>T</span>
+                <span class="star-heart">❤</span>
+            </div>
+        </div>
+        
+        <button class="next-station-btn" data-next="9">
+            <span>Continue Journey</span>
+            <div class="btn-arrow">→</div>
+        </button>
+    </section>
+
+    <!-- ==================== STATION 9: FINAL DESTINATION ==================== -->
+    <section id="station9" class="station">
+        <div class="bg-image" style="background-image: url('images/station9_final.jpg')"></div>
+        <div class="bg-overlay light"></div>
+        <div class="final-particles"></div>
+        <div class="heart-container"></div>
+        
+        <div class="station-content center">
+            <div class="destination-board" id="destination-board">
+                <div class="board-header">FINAL DESTINATION</div>
+                <div class="board-name">TALAT <span>❤</span></div>
+                <div class="board-line"></div>
+            </div>
+            
+            <div class="final-messages" id="final-messages">
+                <div class="final-text" id="f-text1">Destination Reached.</div>
+                <div class="final-text" id="f-text2">Happy 19th Birthday Talat <span>❤</span></div>
+                <div class="final-text" id="f-text3">Thank You For Existing.</div>
+                <div class="final-text" id="f-text4">
+                    <div class="love-line">Love,</div>
+                    <div class="love-name">Ashish <span class="final-heart">❤</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="floating-hearts" id="floating-hearts"></div>
+    </section>
+
+    <!-- Progress Indicator -->
+    <div id="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+        <div class="progress-stops">
+            <div class="stop active" data-station="1"></div>
+            <div class="stop" data-station="2"></div>
+            <div class="stop" data-station="3"></div>
+            <div class="stop" data-station="4"></div>
+            <div class="stop" data-station="5"></div>
+            <div class="stop" data-station="6"></div>
+            <div class="stop" data-station="7"></div>
+            <div class="stop" data-station="8"></div>
+            <div class="stop" data-station="9"></div>
+        </div>
+    </div>
+
+    <audio id="bg-music" loop></audio>
+    <audio id="whistle-sound" src="images/whistle.mp3"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>

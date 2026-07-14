@@ -1,0 +1,1716 @@
+/* ============================================
+   THE TRAIN TO TALAT - MAGICAL JOURNEY
+   Cinematic Interactive Experience
+   ============================================ */
+
+/* ---- CSS Reset & Base ---- */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --font-display: 'Cinzel', serif;
+    --font-handwriting: 'Dancing Script', cursive;
+    --font-body: 'Cormorant Garamond', serif;
+    --font-script: 'Great Vibes', cursive;
+    
+    --gold: #d4a574;
+    --gold-light: #f0d4a8;
+    --gold-dark: #b8834a;
+    --rose: #e8a0bf;
+    --rose-dark: #c97fa0;
+    --cream: #faf6f0;
+    --warm-white: #fff9f0;
+    --deep-brown: #3d2b1f;
+    --midnight: #1a1a2e;
+    --star-gold: #ffd700;
+    --soft-pink: #ffc0cb;
+}
+
+html {
+    scroll-behavior: smooth;
+    overflow: hidden;
+}
+
+body {
+    font-family: var(--font-body);
+    background: var(--midnight);
+    color: var(--cream);
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+/* ---- Loading Screen ---- */
+#loading-screen {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(180deg, #0a0a1a 0%, #1a1a2e 50%, #0f0f23 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    transition: opacity 1.5s ease, visibility 1.5s ease;
+}
+
+#loading-screen.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.loading-train {
+    position: relative;
+    width: 80px;
+    height: 60px;
+    margin-bottom: 40px;
+}
+
+.loading-train::before {
+    content: '🚂';
+    font-size: 60px;
+    position: absolute;
+    animation: trainChug 0.8s ease-in-out infinite alternate;
+}
+
+.train-steam {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    top: -10px;
+    left: 10px;
+    animation: steamRise 1.5s ease-out infinite;
+}
+
+.train-steam:nth-child(2) {
+    left: 25px;
+    animation-delay: 0.3s;
+    width: 8px;
+    height: 8px;
+}
+
+.train-steam:nth-child(3) {
+    left: 40px;
+    animation-delay: 0.6s;
+    width: 6px;
+    height: 6px;
+}
+
+@keyframes trainChug {
+    0% { transform: translateY(0) rotate(-2deg); }
+    100% { transform: translateY(-3px) rotate(2deg); }
+}
+
+@keyframes steamRise {
+    0% { transform: translateY(0) scale(1); opacity: 0.5; }
+    100% { transform: translateY(-40px) scale(2); opacity: 0; }
+}
+
+.loading-text {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: var(--gold-light);
+    letter-spacing: 3px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.loading-text span {
+    color: var(--rose);
+    font-family: var(--font-script);
+    font-size: 1.6rem;
+}
+
+.loading-track {
+    width: 250px;
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.loading-progress {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--rose));
+    border-radius: 3px;
+    animation: loadProgress 2.5s ease-out forwards;
+}
+
+@keyframes loadProgress {
+    0% { width: 0%; }
+    50% { width: 60%; }
+    100% { width: 100%; }
+}
+
+/* ---- Music Control ---- */
+#music-control {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+}
+
+#music-control.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#music-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid rgba(212, 165, 116, 0.4);
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+#music-btn:hover {
+    border-color: var(--gold);
+    background: rgba(0,0,0,0.6);
+    transform: scale(1.1);
+}
+
+#music-btn svg {
+    width: 22px;
+    height: 22px;
+    color: var(--gold-light);
+}
+
+#music-btn .music-note {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 14px;
+    color: var(--rose);
+    animation: noteFloat 2s ease-in-out infinite;
+    opacity: 0;
+}
+
+#music-btn.playing .music-note {
+    opacity: 1;
+}
+
+@keyframes noteFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* ---- Transition Overlay ---- */
+#transition-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--midnight);
+    z-index: 9000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.2s ease-in-out;
+}
+
+#transition-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* ---- Canvases ---- */
+#particle-canvas,
+#fireworks-canvas,
+#constellation-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+}
+
+/* ---- Station Base ---- */
+.station {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1.5s ease, visibility 1.5s ease;
+    z-index: 10;
+    overflow: hidden;
+}
+
+.station.active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 20;
+}
+
+.bg-image {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.1);
+    transition: transform 8s ease-out;
+}
+
+.station.active .bg-image {
+    transform: scale(1);
+}
+
+.bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 1;
+}
+
+.bg-overlay.light {
+    background: rgba(0,0,0,0.2);
+}
+
+.bg-overlay.dark {
+    background: rgba(0,0,0,0.6);
+}
+
+.station-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    max-width: 900px;
+    padding: 40px;
+}
+
+.station-content.center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ---- Typewriter Text ---- */
+.typewriter-text {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--cream);
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+    opacity: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid var(--gold);
+    width: 0;
+    animation: none;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+}
+
+.typewriter-text.animate {
+    animation: typewriter 2.5s steps(40) forwards, blinkCursor 0.8s step-end infinite;
+}
+
+@keyframes typewriter {
+    0% { width: 0; opacity: 1; }
+    100% { width: 100%; opacity: 1; }
+}
+
+@keyframes blinkCursor {
+    0%, 100% { border-color: var(--gold); }
+    50% { border-color: transparent; }
+}
+
+/* ---- Buttons ---- */
+.board-btn,
+.next-station-btn {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    letter-spacing: 3px;
+    padding: 16px 40px;
+    border: 2px solid var(--gold);
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+    color: var(--gold-light);
+    cursor: pointer;
+    border-radius: 50px;
+    transition: all 0.4s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.board-btn::before,
+.next-station-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--rose) 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: -1;
+}
+
+.board-btn:hover,
+.next-station-btn:hover {
+    color: var(--deep-brown);
+    border-color: var(--gold-light);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 40px rgba(212, 165, 116, 0.3);
+}
+
+.board-btn:hover::before,
+.next-station-btn:hover::before {
+    opacity: 1;
+}
+
+.heart-icon {
+    color: var(--rose);
+    font-size: 1.2rem;
+    animation: heartPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes heartPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+.next-station-btn {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.85rem;
+    padding: 14px 35px;
+    opacity: 0;
+    transition: opacity 1s ease, transform 0.4s ease;
+}
+
+.next-station-btn.show {
+    opacity: 1;
+}
+
+.next-station-btn:hover {
+    transform: translateX(-50%) translateY(-3px);
+}
+
+.btn-arrow {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.next-station-btn:hover .btn-arrow {
+    transform: translateX(5px);
+}
+
+.next-station-btn.hidden {
+    display: none;
+}
+
+/* ---- Scroll Indicator ---- */
+.scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+.scroll-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(180deg, var(--gold), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; height: 40px; }
+    50% { opacity: 1; height: 60px; }
+}
+
+/* ============================================
+   STATION 1 - THE DEPARTURE
+   ============================================ */
+
+.rain-container {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.raindrop {
+    position: absolute;
+    width: 1px;
+    height: 20px;
+    background: linear-gradient(180deg, transparent, rgba(255,255,255,0.3));
+    animation: rainFall linear infinite;
+}
+
+@keyframes rainFall {
+    0% { transform: translateY(-100vh); }
+    100% { transform: translateY(100vh); }
+}
+
+.fog-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: 
+        radial-gradient(ellipse at 20% 80%, rgba(200,200,220,0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 60%, rgba(200,200,220,0.1) 0%, transparent 40%);
+    animation: fogMove 20s ease-in-out infinite alternate;
+}
+
+@keyframes fogMove {
+    0% { transform: translateX(-5%); }
+    100% { transform: translateX(5%); }
+}
+
+.lamp-glow {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: 
+        radial-gradient(circle at 15% 30%, rgba(255,200,100,0.25) 0%, transparent 25%),
+        radial-gradient(circle at 85% 40%, rgba(255,200,100,0.15) 0%, transparent 20%);
+}
+
+.train-whistle {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    margin: 20px auto;
+    opacity: 0;
+}
+
+.train-whistle.animate {
+    animation: whistleAppear 0.5s ease forwards;
+}
+
+.whistle-lines {
+    position: absolute;
+    border: 2px solid var(--gold-light);
+    border-radius: 50%;
+    opacity: 0;
+}
+
+.whistle-lines:nth-child(1) {
+    inset: 0;
+    animation: whistleRipple 1.5s ease-out infinite;
+}
+
+.whistle-lines:nth-child(2) {
+    inset: -10px;
+    animation: whistleRipple 1.5s ease-out 0.3s infinite;
+}
+
+.whistle-lines:nth-child(3) {
+    inset: -20px;
+    animation: whistleRipple 1.5s ease-out 0.6s infinite;
+}
+
+@keyframes whistleAppear {
+    0% { opacity: 0; transform: scale(0.5); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes whistleRipple {
+    0% { opacity: 0.6; transform: scale(0.8); }
+    100% { opacity: 0; transform: scale(1.5); }
+}
+
+/* ============================================
+   STATION 2 - THE BLOSSOM VALLEY
+   ============================================ */
+
+.petal-container {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.petal {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    background: linear-gradient(135deg, var(--soft-pink), var(--rose));
+    border-radius: 50% 0 50% 50%;
+    opacity: 0.7;
+    animation: petalFall linear infinite;
+}
+
+.petal-container.pink .petal {
+    background: linear-gradient(135deg, #ffb6c1, #ff69b4);
+}
+
+@keyframes petalFall {
+    0% { 
+        transform: translateY(-10vh) rotate(0deg) translateX(0); 
+        opacity: 0.8; 
+    }
+    50% {
+        transform: translateY(50vh) rotate(180deg) translateX(30px);
+        opacity: 0.6;
+    }
+    100% { 
+        transform: translateY(110vh) rotate(360deg) translateX(-20px); 
+        opacity: 0; 
+    }
+}
+
+.window-frame {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    border: 30px solid rgba(60, 40, 20, 0.6);
+    border-radius: 10px;
+    box-shadow: inset 0 0 100px rgba(0,0,0,0.3);
+}
+
+#s2-text1, #s2-text2 {
+    color: var(--deep-brown);
+    text-shadow: 0 1px 10px rgba(255,255,255,0.5);
+}
+
+.quote-author {
+    font-family: var(--font-handwriting);
+    font-size: 1.4rem;
+    color: var(--deep-brown);
+    margin-top: 20px;
+    opacity: 0;
+    transition: opacity 1s ease 3s;
+}
+
+.quote-author.show {
+    opacity: 0.8;
+}
+
+.parallax-train {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30%;
+    z-index: 4;
+    pointer-events: none;
+    background: linear-gradient(180deg, transparent, rgba(60,40,20,0.4));
+}
+
+/* ============================================
+   STATION 3 - THE MEMORY COACH
+   ============================================ */
+
+.dust-particles {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.dust-particles.golden .dust {
+    background: radial-gradient(circle, rgba(255,215,0,0.6), transparent);
+}
+
+.dust {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: radial-gradient(circle, rgba(255,255,255,0.4), transparent);
+    border-radius: 50%;
+    animation: dustFloat linear infinite;
+}
+
+@keyframes dustFloat {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    20% { opacity: 0.6; }
+    80% { opacity: 0.6; }
+    100% { transform: translateY(-10vh) translateX(50px); opacity: 0; }
+}
+
+.station-title {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    color: var(--gold-light);
+    letter-spacing: 5px;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+}
+
+.station-subtitle {
+    font-family: var(--font-handwriting);
+    font-size: 1.3rem;
+    color: var(--cream);
+    opacity: 0.8;
+    margin-bottom: 40px;
+}
+
+.photo-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px;
+    max-width: 800px;
+}
+
+.polaroid {
+    background: var(--warm-white);
+    padding: 12px 12px 40px 12px;
+    border-radius: 4px;
+    box-shadow: 
+        0 4px 20px rgba(0,0,0,0.3),
+        0 0 0 1px rgba(0,0,0,0.05);
+    transform: rotate(var(--rotate, 0deg));
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    opacity: 0;
+    animation: polaroidAppear 0.8s ease forwards;
+    animation-delay: var(--delay, 0s);
+    width: 180px;
+}
+
+.polaroid:hover {
+    transform: rotate(0deg) scale(1.1);
+    z-index: 100;
+    box-shadow: 
+        0 15px 50px rgba(0,0,0,0.4),
+        0 0 0 1px rgba(0,0,0,0.05);
+}
+
+.polaroid img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 2px;
+    display: block;
+}
+
+.polaroid-caption {
+    font-family: var(--font-handwriting);
+    font-size: 0.95rem;
+    color: var(--deep-brown);
+    text-align: center;
+    margin-top: 10px;
+    position: absolute;
+    bottom: 12px;
+    left: 0;
+    right: 0;
+}
+
+@keyframes polaroidAppear {
+    0% { 
+        opacity: 0; 
+        transform: rotate(var(--rotate, 0deg)) translateY(50px) scale(0.8); 
+    }
+    100% { 
+        opacity: 1; 
+        transform: rotate(var(--rotate, 0deg)) translateY(0) scale(1); 
+    }
+}
+
+/* ---- Photo Modal ---- */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s ease;
+}
+
+.modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    position: relative;
+    max-width: 85vw;
+    max-height: 85vh;
+    transform: scale(0.8);
+    transition: transform 0.4s ease;
+}
+
+.modal.active .modal-content {
+    transform: scale(1);
+}
+
+.modal-content img {
+    max-width: 100%;
+    max-height: 80vh;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.modal-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    font-size: 2rem;
+    color: var(--cream);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.modal-close:hover {
+    color: var(--rose);
+}
+
+.modal-caption {
+    font-family: var(--font-handwriting);
+    font-size: 1.5rem;
+    color: var(--gold-light);
+    text-align: center;
+    margin-top: 15px;
+}
+
+/* ============================================
+   STATION 4 - BIRTHDAY TOWN
+   ============================================ */
+
+.birthday-number {
+    font-family: var(--font-display);
+    font-size: 10rem;
+    font-weight: 700;
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.birthday-number.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.num-glow {
+    background: linear-gradient(135deg, var(--gold), var(--star-gold), var(--rose));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(0 0 30px rgba(255,215,0,0.5));
+    animation: numGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes numGlow {
+    0% { filter: drop-shadow(0 0 20px rgba(255,215,0,0.4)); }
+    100% { filter: drop-shadow(0 0 50px rgba(255,215,0,0.8)); }
+}
+
+.birthday-text {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1s ease 0.5s;
+}
+
+.birthday-text.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.bday-line {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--cream);
+    letter-spacing: 5px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+}
+
+.bday-name {
+    font-family: var(--font-script);
+    font-size: 4rem;
+    color: var(--gold-light);
+    margin-top: 10px;
+    text-shadow: 0 0 40px rgba(212,165,116,0.5);
+}
+
+.heart-pulse {
+    color: var(--rose);
+    animation: heartPulse 1s ease-in-out infinite;
+    display: inline-block;
+}
+
+/* Confetti */
+.confetti-container {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    animation: confettiFall linear infinite;
+}
+
+@keyframes confettiFall {
+    0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+/* Sparkles */
+.sparkle-container {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.sparkle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: var(--star-gold);
+    border-radius: 50%;
+    animation: sparkleAnim 1.5s ease-in-out infinite;
+}
+
+@keyframes sparkleAnim {
+    0%, 100% { opacity: 0; transform: scale(0); }
+    50% { opacity: 1; transform: scale(1); }
+}
+
+/* Balloons */
+.balloons-container {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.balloon {
+    position: absolute;
+    width: 60px;
+    height: 75px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    animation: balloonFloat 8s ease-in-out infinite;
+    bottom: -100px;
+}
+
+.balloon::before {
+    content: '';
+    position: absolute;
+    width: 1px;
+    height: 80px;
+    background: rgba(255,255,255,0.4);
+    bottom: -80px;
+    left: 50%;
+}
+
+.balloon::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 8px;
+    background: inherit;
+    border-radius: 50%;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.balloon:nth-child(1) { left: 10%; background: linear-gradient(135deg, #ff6b8a, #c44569); animation-delay: 0s; }
+.balloon:nth-child(2) { left: 25%; background: linear-gradient(135deg, #f8b500, #f39c12); animation-delay: -2s; height: 65px; width: 50px; }
+.balloon:nth-child(3) { left: 60%; background: linear-gradient(135deg, #74b9ff, #0984e3); animation-delay: -4s; }
+.balloon:nth-child(4) { left: 75%; background: linear-gradient(135deg, #a29bfe, #6c5ce7); animation-delay: -1s; height: 70px; width: 55px; }
+.balloon:nth-child(5) { left: 90%; background: linear-gradient(135deg, #fd79a8, #e84393); animation-delay: -3s; height: 55px; width: 45px; }
+
+@keyframes balloonFloat {
+    0%, 100% { transform: translateY(0) translateX(0) rotate(-3deg); }
+    25% { transform: translateY(-30vh) translateX(15px) rotate(3deg); }
+    50% { transform: translateY(-60vh) translateX(-10px) rotate(-2deg); }
+    75% { transform: translateY(-40vh) translateX(20px) rotate(2deg); }
+}
+
+/* ============================================
+   STATION 5 - THE WISHES PLATFORM
+   ============================================ */
+
+.wishes-title {
+    margin-bottom: 40px;
+    font-size: 2.5rem;
+}
+
+.wishes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    max-width: 600px;
+}
+
+.wish-card {
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: all 1s ease;
+    transition-delay: var(--delay, 0s);
+}
+
+.wish-card.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.wish-paper {
+    background: rgba(255, 248, 240, 0.92);
+    padding: 25px 35px;
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 
+        0 4px 20px rgba(0,0,0,0.15),
+        inset 0 0 60px rgba(212,165,116,0.05);
+    border-left: 4px solid var(--rose);
+}
+
+.wish-paper::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 20px;
+    width: 30px;
+    height: 15px;
+    background: rgba(212,165,116,0.3);
+    border-radius: 0 0 50% 50%;
+}
+
+.handwriting-text {
+    font-family: var(--font-handwriting);
+    font-size: 1.3rem;
+    color: var(--deep-brown);
+    line-height: 1.6;
+}
+
+/* Floating Lanterns */
+.floating-lanterns {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.lantern {
+    position: absolute;
+    width: 30px;
+    height: 40px;
+    background: radial-gradient(ellipse at center, rgba(255,200,100,0.8), rgba(255,160,50,0.4));
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    animation: lanternFloat linear infinite;
+    box-shadow: 0 0 20px rgba(255,200,100,0.4);
+}
+
+.lantern::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 5px;
+    background: rgba(139,90,43,0.6);
+    border-radius: 2px;
+}
+
+@keyframes lanternFloat {
+    0% { transform: translateY(110vh) translateX(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-10vh) translateX(30px); opacity: 0; }
+}
+
+/* ============================================
+   STATION 6 - THE SECRET PACKAGE
+   ============================================ */
+
+.package-scene {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+.old-package {
+    cursor: pointer;
+    transition: all 0.5s ease;
+    opacity: 1;
+}
+
+.old-package.hidden {
+    opacity: 0;
+    transform: scale(0.8);
+    pointer-events: none;
+}
+
+.package-box {
+    width: 160px;
+    height: 130px;
+    background: linear-gradient(135deg, #8B7355, #A0826D);
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 
+        0 10px 40px rgba(0,0,0,0.4),
+        inset 0 0 30px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.package-ribbon {
+    position: absolute;
+    width: 100%;
+    height: 25px;
+    background: linear-gradient(90deg, var(--rose-dark), var(--rose));
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.package-ribbon::before {
+    content: '';
+    position: absolute;
+    width: 25px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--rose-dark), var(--rose));
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.package-tag {
+    position: absolute;
+    bottom: -25px;
+    font-family: var(--font-handwriting);
+    font-size: 1.1rem;
+    color: var(--gold-light);
+    white-space: nowrap;
+}
+
+.package-tag span {
+    color: var(--rose);
+}
+
+.tap-hint {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    color: var(--gold);
+    letter-spacing: 3px;
+    margin-top: 50px;
+    opacity: 0.6;
+    animation: tapPulse 2s ease-in-out infinite;
+}
+
+@keyframes tapPulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+}
+
+.envelope-reveal {
+    position: absolute;
+    opacity: 0;
+    transform: scale(0.5) translateY(20px);
+    transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+}
+
+.envelope-reveal.show {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+.envelope-img {
+    width: 200px;
+    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.4));
+}
+
+.envelope-glow {
+    position: absolute;
+    inset: -20px;
+    background: radial-gradient(circle, rgba(212,165,116,0.3), transparent 70%);
+    animation: glowPulse 2s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+@keyframes glowPulse {
+    0% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* ============================================
+   STATION 7 - THE LETTER STATION
+   ============================================ */
+
+.candle-glow {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: 
+        radial-gradient(circle at 50% 60%, rgba(255,200,100,0.2) 0%, transparent 40%);
+    animation: candleFlicker 3s ease-in-out infinite alternate;
+}
+
+@keyframes candleFlicker {
+    0% { opacity: 0.8; }
+    100% { opacity: 1; }
+}
+
+.letter-scene {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 500px;
+}
+
+.envelope-closed {
+    cursor: pointer;
+    transition: all 0.5s ease;
+    position: relative;
+    opacity: 1;
+}
+
+.envelope-closed.hidden {
+    opacity: 0;
+    transform: scale(0.9);
+    pointer-events: none;
+}
+
+.letter-envelope-img {
+    width: 250px;
+    filter: drop-shadow(0 15px 40px rgba(0,0,0,0.5));
+    transition: transform 0.3s ease;
+}
+
+.envelope-closed:hover .letter-envelope-img {
+    transform: scale(1.05);
+}
+
+.wax-seal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -30%);
+    width: 60px;
+    height: 60px;
+    transition: all 0.3s ease;
+}
+
+.wax-seal img {
+    width: 100%;
+    filter: drop-shadow(0 3px 10px rgba(0,0,0,0.3));
+}
+
+.envelope-closed:hover .wax-seal {
+    transform: translate(-50%, -30%) scale(1.1);
+}
+
+.letter-opened {
+    position: absolute;
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    transition: all 1s ease;
+    pointer-events: none;
+    max-width: 550px;
+}
+
+.letter-opened.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
+
+.letter-paper {
+    background: linear-gradient(180deg, #faf6f0 0%, #f5f0e8 100%);
+    padding: 50px;
+    border-radius: 4px;
+    box-shadow: 
+        0 10px 50px rgba(0,0,0,0.3),
+        inset 0 0 100px rgba(212,165,116,0.05);
+    position: relative;
+}
+
+.letter-paper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--rose), var(--gold), var(--rose));
+    border-radius: 4px 4px 0 0;
+}
+
+.letter-content {
+    font-family: var(--font-handwriting);
+    color: var(--deep-brown);
+    text-align: left;
+}
+
+.letter-line {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    margin-bottom: 15px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.8s ease;
+}
+
+.letter-line.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.letter-line:first-child {
+    font-size: 1.4rem;
+    color: var(--rose-dark);
+    margin-bottom: 25px;
+}
+
+.letter-line.signature {
+    margin-top: 30px;
+    margin-bottom: 5px;
+    font-style: italic;
+}
+
+.letter-line.signature-name {
+    font-family: var(--font-script);
+    font-size: 2rem;
+    color: var(--rose-dark);
+}
+
+.letter-line.signature-name span {
+    color: #e74c3c;
+}
+
+/* ============================================
+   STATION 8 - THE STARLIGHT BRIDGE
+   ============================================ */
+
+.constellation-text {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    color: var(--cream);
+    letter-spacing: 3px;
+    margin-bottom: 40px;
+    opacity: 0;
+    transition: opacity 1s ease;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+}
+
+.constellation-text.show {
+    opacity: 1;
+}
+
+.constellation-text p {
+    margin-bottom: 10px;
+}
+
+.star-name {
+    font-family: var(--font-display);
+    font-size: 4rem;
+    letter-spacing: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    transition: opacity 2s ease 2s;
+}
+
+.star-name.show {
+    opacity: 1;
+}
+
+.star-name span {
+    background: linear-gradient(180deg, var(--star-gold), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(0 0 20px rgba(255,215,0,0.6));
+    animation: starLetterGlow 2s ease-in-out infinite alternate;
+}
+
+.star-name span:nth-child(1) { animation-delay: 0s; }
+.star-name span:nth-child(2) { animation-delay: 0.2s; }
+.star-name span:nth-child(3) { animation-delay: 0.4s; }
+.star-name span:nth-child(4) { animation-delay: 0.6s; }
+.star-name span:nth-child(5) { animation-delay: 0.8s; }
+
+.star-heart {
+    font-size: 3rem;
+    -webkit-text-fill-color: var(--rose) !important;
+    filter: drop-shadow(0 0 15px rgba(232,160,191,0.8)) !important;
+}
+
+@keyframes starLetterGlow {
+    0% { filter: drop-shadow(0 0 10px rgba(255,215,0,0.4)); }
+    100% { filter: drop-shadow(0 0 30px rgba(255,215,0,0.8)); }
+}
+
+/* Fireflies */
+.firefly-container {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.firefly {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #ffff99;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #ffff99, 0 0 20px #ffff99;
+    animation: fireflyMove ease-in-out infinite;
+}
+
+@keyframes fireflyMove {
+    0%, 100% { 
+        transform: translate(0, 0); 
+        opacity: 0; 
+    }
+    25% { 
+        transform: translate(30px, -40px); 
+        opacity: 1; 
+    }
+    50% { 
+        transform: translate(-20px, -80px); 
+        opacity: 0.5; 
+    }
+    75% { 
+        transform: translate(40px, -30px); 
+        opacity: 1; 
+    }
+}
+
+/* ============================================
+   STATION 9 - FINAL DESTINATION
+   ============================================ */
+
+.final-particles {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.final-particle {
+    position: absolute;
+    border-radius: 50%;
+    animation: finalParticleFloat linear infinite;
+}
+
+@keyframes finalParticleFloat {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    20% { opacity: 1; transform: translateY(80vh) scale(1); }
+    80% { opacity: 1; }
+    100% { transform: translateY(-10vh) scale(0.5); opacity: 0; }
+}
+
+.destination-board {
+    background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.5));
+    backdrop-filter: blur(20px);
+    border: 2px solid var(--gold);
+    border-radius: 15px;
+    padding: 40px 60px;
+    margin-bottom: 40px;
+    opacity: 0;
+    transform: translateY(-30px) scale(0.9);
+    transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 
+        0 0 60px rgba(212,165,116,0.2),
+        inset 0 0 60px rgba(212,165,116,0.05);
+}
+
+.destination-board.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.board-header {
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    letter-spacing: 8px;
+    color: var(--gold);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+.board-name {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    letter-spacing: 10px;
+    color: var(--gold-light);
+}
+
+.board-name span {
+    color: var(--rose);
+}
+
+.board-line {
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 20px auto 0;
+}
+
+.final-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.final-text {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--cream);
+    letter-spacing: 3px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 1s ease;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+}
+
+.final-text.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#f-text2 {
+    font-family: var(--font-script);
+    font-size: 2.8rem;
+    color: var(--gold-light);
+}
+
+#f-text2 span {
+    color: var(--rose);
+}
+
+#f-text3 {
+    font-family: var(--font-handwriting);
+    font-size: 1.6rem;
+    color: var(--cream);
+    opacity: 0.9;
+}
+
+.love-line {
+    font-family: var(--font-handwriting);
+    font-size: 1.3rem;
+    color: var(--gold);
+    margin-bottom: 5px;
+}
+
+.love-name {
+    font-family: var(--font-script);
+    font-size: 2.2rem;
+    color: var(--rose);
+}
+
+.final-heart {
+    animation: heartPulse 1.2s ease-in-out infinite;
+    display: inline-block;
+}
+
+/* Floating Hearts */
+.heart-container {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.floating-heart {
+    position: absolute;
+    color: var(--rose);
+    font-size: 20px;
+    animation: heartFloat linear infinite;
+    opacity: 0.7;
+}
+
+@keyframes heartFloat {
+    0% { transform: translateY(100vh) scale(0) rotate(0deg); opacity: 0; }
+    20% { opacity: 0.7; transform: translateY(80vh) scale(1) rotate(10deg); }
+    80% { opacity: 0.7; }
+    100% { transform: translateY(-10vh) scale(0.5) rotate(-10deg); opacity: 0; }
+}
+
+/* ============================================
+   PROGRESS BAR
+   ============================================ */
+
+#progress-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    max-width: 600px;
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+#progress-bar.show {
+    opacity: 1;
+}
+
+.progress-fill {
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), var(--rose));
+    border-radius: 2px;
+    transition: width 1s ease;
+    width: 0%;
+}
+
+.progress-stops {
+    display: flex;
+    justify-content: space-between;
+    margin-top: -5px;
+}
+
+.stop {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    border: 1px solid rgba(212,165,116,0.3);
+    transition: all 0.5s ease;
+    cursor: pointer;
+}
+
+.stop.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 10px rgba(212,165,116,0.5);
+}
+
+.stop:hover {
+    background: var(--gold-light);
+    transform: scale(1.3);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .typewriter-text {
+        font-size: 1.3rem;
+        letter-spacing: 2px;
+    }
+    
+    .station-title {
+        font-size: 1.6rem;
+    }
+    
+    .birthday-number {
+        font-size: 6rem;
+    }
+    
+    .bday-name {
+        font-size: 2.5rem;
+    }
+    
+    .star-name {
+        font-size: 2.2rem;
+        letter-spacing: 8px;
+    }
+    
+    .polaroid {
+        width: 140px;
+    }
+    
+    .polaroid img {
+        height: 110px;
+    }
+    
+    .board-name {
+        font-size: 2rem;
+    }
+    
+    .destination-board {
+        padding: 25px 35px;
+    }
+    
+    .letter-paper {
+        padding: 30px;
+    }
+    
+    .letter-line {
+        font-size: 1rem;
+    }
+    
+    .handwriting-text {
+        font-size: 1.1rem;
+    }
+    
+    .package-box {
+        width: 130px;
+        height: 110px;
+    }
+    
+    .letter-envelope-img {
+        width: 180px;
+    }
+    
+    .envelope-img {
+        width: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .typewriter-text {
+        font-size: 1rem;
+        white-space: normal;
+        border-right: none;
+        width: auto !important;
+        opacity: 1;
+    }
+    
+    .photo-gallery {
+        gap: 15px;
+    }
+    
+    .polaroid {
+        width: 120px;
+    }
+    
+    .polaroid img {
+        height: 90px;
+    }
+    
+    .station-content {
+        padding: 20px;
+    }
+}
